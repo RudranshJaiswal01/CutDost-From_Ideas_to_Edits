@@ -1,5 +1,4 @@
 import os
-import time
 import json
 from typing import List, Optional
 from groq import Groq
@@ -71,36 +70,31 @@ def generate_response(
     messages.extend(chat_history)
     messages.append({"role": "user", "content": user_message})
 
-    retries = 3
-    for attempt in range(1, retries + 1):
-        try:
-            response = client.chat.completions.create(
-                model=model_name,
-                messages=messages,
-                response_format={
-                    "type": "json_schema",
-                    "json_schema": {
-                        "name": "ai_response",
-                        "schema": AIResponse.model_json_schema(),
-                    },
+    try:
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=messages,
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "ai_response",
+                    "schema": AIResponse.model_json_schema(),
                 },
-                temperature=0.1,
-                max_completion_tokens=8192*8,
-                top_p=1,
-                reasoning_effort="high",
-                # tools=[{"type":"code_interpreter"}]
-            )
-            response_text = response.choices[0].message.content
-            print(response.choices[0].message)
-            ai_resp = AIResponse.model_validate(json.loads(response_text))
-            return ai_resp.model_dump()
-        except Exception as e:
-            if attempt == retries:
-                return {
-                    "message": f"⚠️ Sorry, I failed after {retries} attempts. Error: {str(e)}",
-                    "editing_code": None,
-                    "required_libs": None,
-                    "reason": "System could not complete the request, needs user clarification.",
-                }
-            time.sleep(1)
-            continue
+            },
+            temperature=0.1,
+            max_completion_tokens=8192*8,
+            top_p=1,
+            reasoning_effort="high",
+            # tools=[{"type":"code_interpreter"}]
+        )
+        response_text = response.choices[0].message.content
+        print(response.choices[0].message)
+        ai_resp = AIResponse.model_validate(json.loads(response_text))
+        return ai_resp.model_dump()
+    except Exception as e:
+            return {
+                "message": f"⚠️ Sorry, I failed. Error: {str(e)}",
+                "editing_code": None,
+                "required_libs": None,
+                "reason": "System could not complete the request, needs user clarification.",
+            }

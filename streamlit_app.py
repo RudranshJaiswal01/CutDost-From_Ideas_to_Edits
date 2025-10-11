@@ -156,38 +156,6 @@ if user_input:
                         chat_history=st.session_state.chat_history,
                     )
                     code_to_run = fix_resp.get("editing_code")
-
-                    # exec(code_to_run, globals(), local_env)
-
-                    # if Path("output.mp4").exists():
-                    #     # Save unique version of each output
-                    #     out_file = f"output_{int(time.time())}.mp4"
-                    #     os.rename("output.mp4", out_file)
-                    #     st.session_state.last_output = out_file
-                    #     st.success("✅ Edit applied successfully!")
-                    #     st.video(out_file)
-                    # else:
-                    #     st.success("✅ Code executed successfully (no video output).")
-
-                except Exception as e:
-                    error = str(e)
-                    st.warning(f"⚠️ Attempt {attempt} failed: {error}")
-
-                    # Retry with AI code fix
-                    fix_prompt = (
-                        f"The following code failed with error:\n{error}\n\n"
-                        f"Here is the broken code:\n{code_to_run}\n\n"
-                        "Please return corrected code in JSON schema format."
-                    )
-                    fix_resp = generate_response(
-                        library_choice=st.session_state.library_choice,
-                        user_message=fix_prompt,
-                        video_desc=st.session_state.video_desc,
-                        video_file_path=st.session_state.assets["main_video"],
-                        assets=st.session_state.assets,
-                        chat_history=st.session_state.chat_history,
-                    )
-                    code_to_run = fix_resp.get("editing_code")
-
+                    
             if not success:
                 st.error("❌ Error occurred during editing. Please clarify your request.")
