@@ -2,10 +2,11 @@ import google.generativeai as genai
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import streamlit as st
 
 # Configure the API
 load_dotenv()
-api_key = os.getenv("GEMINI_API") # Load from .env file
+api_key = os.getenv("GEMINI_API_KEY") or st.secrets["GEMINI_API_KEY"] # Load from .env file or secrets.
 genai.configure(api_key=api_key)
 
 # Initialize the model
