@@ -42,5 +42,3 @@ def video_descriptor(video_path: str) -> str:
     )
 
     return response.text
-
-print(video_descriptor("input.mp4"))
