@@ -157,7 +157,15 @@ if user_input:
                             assets=st.session_state.assets,
                             chat_history=st.session_state.chat_history,
                         )
+                        message = fix_resp.get("message", "No message")
+                        if message:
+                            st.markdown(message)
+
                         code_to_run = fix_resp.get("editing_code")
+
+                        if not code_to_run:
+                            st.error("❌ Regenerated response did not contain code. Stopping retries.")
+                            break
                     
             if not success:
                 st.error("❌ Error occurred during editing. Please clarify your request.")
