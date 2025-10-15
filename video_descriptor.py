@@ -5,9 +5,12 @@ import os
 import streamlit as st
 
 # Configure the API
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY") or st.secrets["GEMINI_API_KEY"] # Load from .env file or secrets.
-genai.configure(api_key=api_key)
+try:
+    load_dotenv()
+    api_key = os.getenv("GEMINI_API_KEY") or st.secrets["GEMINI_API_KEY"] # Load from .env file or secrets.
+    genai.configure(api_key=api_key)
+except Exception as e:
+    st.error(e)
 
 # Initialize the model
 model = genai.GenerativeModel('gemini-2.5-flash-lite')

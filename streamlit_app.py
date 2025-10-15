@@ -1,5 +1,5 @@
 import os
-import subprocess
+import subprocess, sys
 import time
 import streamlit as st
 from pathlib import Path
@@ -102,8 +102,9 @@ if user_input:
     # Display assistant message
     with st.chat_message("assistant"):
         st.markdown(ai_resp["message"])
-        if ai_resp.get("reason"):
-            st.caption(f"🤔 Thought: {ai_resp['reason']}")
+        with st.spinner("Generating response..."):
+            if ai_resp.get("reason"):
+                st.caption(f"🤔 Thought: {ai_resp['reason']}")
 
         # Handle editing code automatically
         if ai_resp.get("editing_code"):
@@ -116,22 +117,23 @@ if user_input:
 
             for attempt in range(1, retries + 1):
                 try:
-                    local_env = {"assets": st.session_state.assets}
-                    if code_to_run:
-                        st.session_state["last_code"] = code_to_run
-                        with open("generated_edit.py", "w") as f:
-                            f.write(code_to_run)
+                    with st.spinner(f"Attempt-{attempt} to run code..."):
+                        local_env = {"assets": st.session_state.assets}
+                        if code_to_run:
+                            st.session_state["last_code"] = code_to_run
+                            with open("generated_edit.py", "w") as f:
+                                f.write(code_to_run)
 
-                        # Try executing generated code
-                        subprocess.run(["python", "generated_edit.py"], check=True)
-                        if Path("output.mp4").exists():
-                            out_file = f"output_{int(time.time())}.mp4"
-                            os.rename("output.mp4", out_file)
-                            st.session_state.last_output = out_file
-                            st.success("✅ Edit applied successfully!")
-                            st.video(out_file)
-                        else:
-                            st.success("✅ Code executed successfully (no video output).")
+                            # Try executing generated code
+                            subprocess.run([sys.executable, "generated_edit.py"], check=True)
+                            if Path("output.mp4").exists():
+                                out_file = f"output_{int(time.time())}.mp4"
+                                os.rename("output.mp4", out_file)
+                                st.session_state.last_output = out_file
+                                st.success("✅ Edit applied successfully!")
+                                st.video(out_file)
+                            else:
+                                st.success("✅ Code executed successfully (no video output).")
 
                     success = True
                     break
@@ -140,22 +142,22 @@ if user_input:
                     error = str(e)
                     st.warning(f"⚠️ Attempt {attempt} failed: {error}")
                     st.error(f"Error running generated code: {e}")
-
                     # Retry with AI code fix
-                    fix_prompt = (
-                        f"The following code failed with error:\n{error}\n\n"
-                        f"Here is the broken code:\n{code_to_run}\n\n"
-                        "Please return corrected code in JSON schema format."
-                    )
-                    fix_resp = generate_response(
-                        library_choice=st.session_state.library_choice,
-                        user_message=fix_prompt,
-                        video_desc=st.session_state.video_desc,
-                        video_file_path=st.session_state.assets["main_video"],
-                        assets=st.session_state.assets,
-                        chat_history=st.session_state.chat_history,
-                    )
-                    code_to_run = fix_resp.get("editing_code")
+                    with st.spinner(f"Regenerating response..."):
+                        fix_prompt = (
+                            f"The following code failed with error:\n{error}\n\n"
+                            f"Here is the broken code:\n{code_to_run}\n\n"
+                            "Please return corrected code in JSON schema format."
+                        )
+                        fix_resp = generate_response(
+                            library_choice=st.session_state.library_choice,
+                            user_message=fix_prompt,
+                            video_desc=st.session_state.video_desc,
+                            video_file_path=st.session_state.assets["main_video"],
+                            assets=st.session_state.assets,
+                            chat_history=st.session_state.chat_history,
+                        )
+                        code_to_run = fix_resp.get("editing_code")
                     
             if not success:
                 st.error("❌ Error occurred during editing. Please clarify your request.")

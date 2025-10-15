@@ -8,11 +8,12 @@ import streamlit as st
 # ----------------------------------------------------------------------
 # Load environment
 # ----------------------------------------------------------------------
-load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY") or st.secrets["GROQ_API_KEY"] # Load from .env file or secrets.
-if not GROQ_API_KEY:
-    raise RuntimeError("GROQ_API not found in environment. Please set it in .env")
-
+try:
+    load_dotenv()
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY") or st.secrets["GROQ_API_KEY"] # Load from .env file or secrets.
+except Exception as e:
+    st.error(e)
+    
 client = Groq(api_key=GROQ_API_KEY)
 
 # ----------------------------------------------------------------------
