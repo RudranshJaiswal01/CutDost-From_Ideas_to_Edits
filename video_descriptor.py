@@ -13,7 +13,7 @@ except Exception as e:
     st.error(e)
 
 # Initialize the model
-model = genai.GenerativeModel('gemini-2.5-flash-lite')
+model = genai.GenerativeModel('gemini-2.5-pro')
 
 def video_descriptor(video_path: str) -> str:
     """
