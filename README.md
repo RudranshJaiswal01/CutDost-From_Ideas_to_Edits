@@ -33,6 +33,10 @@ CutDost is an AI-powered chatbot designed to make video editing as easy as chatt
 4. **Automatic Editing**: The code is extracted and executed to apply edits on the uploaded video. If the code throws an error, it is fed back to the model for fixing (up to 5 retries).
 5. **Final Output**: A preview of the edited video is displayed to the user, ready to download.
 
+### Video Demo:
+  [Video link](https://drive.google.com/file/d/1VzGm1x8RLZvMidu-VtmrdjYPBdoSlW8q/view?usp=drivesdk)
+
+
 ## 📦 Installation & Setup
 
 1. **Clone the repository:**
